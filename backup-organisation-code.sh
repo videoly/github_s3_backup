@@ -8,7 +8,8 @@ export GH_TOKEN=$BACKUP_GITHUB_PAT
 gh auth setup-git
 
 echo "Downloading repositories for" $BACKUP_GITHUB_OWNER
-gh repo list $BACKUP_GITHUB_OWNER --json "name" --limit 1000 --template '{{range .}}{{ .name }}{{"\n"}}{{end}}' | xargs -L1 -I {} gh repo clone $BACKUP_GITHUB_OWNER/{}
+gh repo list $BACKUP_GITHUB_OWNER --json "name" --limit 1000 --template '{{range .}}{{ .name }}{{"\n"}}{{end}}' | xargs -L1 -I {} gh repo clone $BACKUP_GITHUB_OWNER/{} -- --no-checkout
+gh repo list $BACKUP_GITHUB_OWNER --json "name" --limit 1000 --template '{{range .}}{{ .name }}{{"\n"}}{{end}}' | xargs -L1 -I {} gh repo clone $BACKUP_GITHUB_OWNER/{} -- --no-checkout
 
 echo "Downloaded repositories..."
 find  . -maxdepth 1 -type d
