@@ -12,7 +12,7 @@ gh repo list $BACKUP_GITHUB_OWNER --json "name" --limit 1000 --template '{{range
 
 # Zip all the repositories with maximum compression
 echo "Zipping repositories..."
-find  . -maxdepth 1 -type d -exec zip -r -9 {}.zip {} \;
+find  . -maxdepth 1 -type d ! -path . -exec zip -r -9 {}.zip {} \;
 
 # Upload zip files to S3
 echo "Uploading to S3 bucket" $BACKUP_BUCKET_NAME "in region" $BACKUP_AWS_REGION
