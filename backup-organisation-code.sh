@@ -10,10 +10,13 @@ gh auth setup-git
 echo "Downloading repositories for" $BACKUP_GITHUB_OWNER
 gh repo list $BACKUP_GITHUB_OWNER --json "name" --limit 1000 --template '{{range .}}{{ .name }}{{"\n"}}{{end}}' | xargs -L1 -I {} gh repo clone $BACKUP_GITHUB_OWNER/{} -- --no-checkout
 
-echo "Downloaded repositories..."
-find  . -maxdepth 1 -type d
+# Zip all the repositories with maximum compression
+echo "Zipping repositories..."
+find  . -maxdepth 1 -type d -exec zip -r -9 {}.zip {} \;
 
+# Upload zip files to S3
 echo "Uploading to S3 bucket" $BACKUP_BUCKET_NAME "in region" $BACKUP_AWS_REGION
-aws s3 sync --quiet --no-follow-symlinks --region=$BACKUP_AWS_REGION . s3://$BACKUP_BUCKET_NAME/github.com/$BACKUP_GITHUB_OWNER/`date "+%Y-%m-%d"`/
+# aws s3 sync --quiet --no-follow-symlinks --region=$BACKUP_AWS_REGION . s3://$BACKUP_BUCKET_NAME/github.com/$BACKUP_GITHUB_OWNER/`date "+%Y-%m-%d"`/
+aws s3 cp . s3://$BACKUP_BUCKET_NAME/github.com/$BACKUP_GITHUB_OWNER/`date "+%Y-%m-%d"`/ --recursive --exclude "*" --include "*.zip" --quiet --region=$BACKUP_AWS_REGION
 
 echo "Complete."
